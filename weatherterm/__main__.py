@@ -1,7 +1,7 @@
 import sys
 from argparse import ArgumentParser
 
-from weatherterm.core import parser_loader, ForecastType, Unit
+from weatherterm.core import parser_loader, ForecastType, Unit, SetUnitAction
 
 def _validate_forecast_args(args):
     if args.forecast_option is None:
@@ -9,7 +9,7 @@ def _validate_forecast_args(args):
         print(f'{argparser.prog}: error: {err_msg}', file = sys.stderr)
         sys.exit()
 
-parsers = parser_loader.load('.weatherterm/parsers')
+parsers = parser_loader.load('weatherterm/parsers')
 
 argparser = ArgumentParser(
     prog = 'weatherterm',
@@ -30,6 +30,7 @@ argparser.add_argument(
     '-u', '--unit',
     choices=unit_values,
     required=False,
+    action=SetUnitAction,
     dest='unit',
     help = 'Specify the unit to display the temperatures'
 )
@@ -48,11 +49,35 @@ argparser.add_argument(
 )
 
 argparser.add_argument(
-    'td', '--today',
+    '-td', '--today',
     dest='forecast_option',
     action='store_const',
     const=ForecastType.TODAY,
     help='Show the weather forecast for the current day'
+)
+
+argparser.add_argument(
+    '-5d', '--fivedays',
+    dest='forecast_option',
+    action='store_const',
+    const=ForecastType.FIVEDAYS,
+    help='Show the weather forecast for the next 5 days'
+)
+
+argparser.add_argument(
+    '-10d', '--tendays',
+    dest='forecast_option',
+    action='store_const',
+    const=ForecastType.TENDAYS,
+    help='Show the weather forecast for the next 10 days'
+)
+
+argparser.add_argument(
+    '-w', '--weekend',
+    dest='forecast_option',
+    action='store_const',
+    const=ForecastType.WEEKEND,
+    help='Show the weather forecast for the next weekend'
 )
 
 args = argparser.parse_args()
