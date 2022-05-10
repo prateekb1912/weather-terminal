@@ -13,4 +13,4 @@ class Request:
             error_msg = "Could not find the are you were looking for."
             raise Exception(error_msg)
         
-        return resp.text
+        return resp.content
