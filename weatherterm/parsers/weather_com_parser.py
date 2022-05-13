@@ -1,5 +1,6 @@
 import re
 from bs4 import BeautifulSoup
+from datetime import date, timedelta
 
 from weatherterm.core import ForecastType, Request, Unit, UnitConverter
 from weatherterm.core.forecast import Forecast
@@ -92,14 +93,14 @@ class WeatherComParser:
         forecast_details = list_divs_forecasts.find_all('details')[:5]
 
         forecast_results = []
+        curr_date = date.today()
         for curr_forecast in forecast_details:
             weather_summary = curr_forecast.find('summary')
             dailyTemperature = weather_summary.find('div', {'data-testid':'detailsTemperature'}).text
             hi, lo = [temp for temp in dailyTemperature.split('/')]
             description = weather_summary.find('div', {'data-testid': 'wxIcon'}).find('span').text
-            rain_forecast = weather_summary.find('div', {'data-testid': 'Precip'}).text
-            wind = weather_summary.find('div', {'data-testid': 'wind'}).text
-
+            rain_forecast = weather_summary.find('div', {'data-testid': 'Precip'}).find('span').text
+            wind = weather_summary.find('div', {'data-testid': 'wind'}).find('span').text
             forecast = Forecast(
                 self._clear_str_number(dailyTemperature),
                 rain_forecast,
@@ -107,9 +108,10 @@ class WeatherComParser:
                 hi,
                 lo,
                 description,
-                
+                curr_date
             )
             forecast_results.append(forecast)
+            curr_date = curr_date + timedelta(days=1)
 
         return forecast_results
 
