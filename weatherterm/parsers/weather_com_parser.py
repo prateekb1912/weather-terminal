@@ -1,4 +1,3 @@
-from audioop import add
 import re
 from bs4 import BeautifulSoup
 
@@ -82,8 +81,38 @@ class WeatherComParser:
 
     def _weekend_forecast(self, args):
         raise NotImplementedError()
+
     def _fivedays_forecast(self, args):
-        raise NotImplementedError()
+        content = self._request.fetch_data(args.forecast_option.value, args.area_code)
+        bs = BeautifulSoup(content, 'html.parser')
+
+        list_divs_regex = re.compile('DailyForecast--DisclosureList*')
+        list_divs_forecasts = bs.find('div', {'class': list_divs_regex})
+
+        forecast_details = list_divs_forecasts.find_all('details')[:5]
+
+        forecast_results = []
+        for curr_forecast in forecast_details:
+            weather_summary = curr_forecast.find('summary')
+            dailyTemperature = weather_summary.find('div', {'data-testid':'detailsTemperature'}).text
+            hi, lo = [temp for temp in dailyTemperature.split('/')]
+            description = weather_summary.find('div', {'data-testid': 'wxIcon'}).find('span').text
+            rain_forecast = weather_summary.find('div', {'data-testid': 'Precip'}).text
+            wind = weather_summary.find('div', {'data-testid': 'wind'}).text
+
+            forecast = Forecast(
+                self._clear_str_number(dailyTemperature),
+                rain_forecast,
+                wind,
+                hi,
+                lo,
+                description,
+                
+            )
+            forecast_results.append(forecast)
+
+        return forecast_results
+
     def _tendays_forecast(self, args):
         raise NotImplementedError()
 
