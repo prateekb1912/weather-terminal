@@ -27,8 +27,40 @@ class WeatherComParser:
         str_details['Wind'] = re.sub('Wind Direction', '', str_details['Wind'])
         str_details['Pressure'] = re.sub('Arrow Down', '', str_details['Pressure'])
 
-        return str_details
+        return str_details        
 
+    def future_forecast_parser(self, area_code, n_days):
+        content = self._request.fetch_data('tenday', area_code)
+        bs = BeautifulSoup(content, 'html.parser')
+
+        list_divs_regex = re.compile('DailyForecast--DisclosureList*')
+        list_divs_forecasts = bs.find('div', {'class': list_divs_regex})
+
+        forecast_details = list_divs_forecasts.find_all('details')[:n_days]
+
+        forecast_results = []
+        curr_date = date.today()
+        for curr_forecast in forecast_details:
+            weather_summary = curr_forecast.find('summary')
+            dailyTemperature = weather_summary.find('div', {'data-testid':'detailsTemperature'}).text
+            hi, lo = [self._clear_str_number(temp) for temp in dailyTemperature.split('/')]
+            description = weather_summary.find('div', {'data-testid': 'wxIcon'}).find('span').text
+            rain_forecast = weather_summary.find('div', {'data-testid': 'Precip'}).find('span').text
+            wind = weather_summary.find('div', {'data-testid': 'wind'}).find('span').text
+            forecast = Forecast(
+                self._clear_str_number(dailyTemperature),
+                rain_forecast,
+                wind,
+                hi,
+                lo,
+                description,
+                curr_date,
+                ForecastType.FIVEDAYS
+            )
+            forecast_results.append(forecast)
+            curr_date = curr_date + timedelta(days=1)
+
+        return forecast_results
 
     def _today_forecast(self, args):
         content = self._request.fetch_data(args.forecast_option.value, args.area_code)
@@ -84,39 +116,10 @@ class WeatherComParser:
         raise NotImplementedError()
 
     def _fivedays_forecast(self, args):
-        content = self._request.fetch_data(args.forecast_option.value, args.area_code)
-        bs = BeautifulSoup(content, 'html.parser')
-
-        list_divs_regex = re.compile('DailyForecast--DisclosureList*')
-        list_divs_forecasts = bs.find('div', {'class': list_divs_regex})
-
-        forecast_details = list_divs_forecasts.find_all('details')[:5]
-
-        forecast_results = []
-        curr_date = date.today()
-        for curr_forecast in forecast_details:
-            weather_summary = curr_forecast.find('summary')
-            dailyTemperature = weather_summary.find('div', {'data-testid':'detailsTemperature'}).text
-            hi, lo = [temp for temp in dailyTemperature.split('/')]
-            description = weather_summary.find('div', {'data-testid': 'wxIcon'}).find('span').text
-            rain_forecast = weather_summary.find('div', {'data-testid': 'Precip'}).find('span').text
-            wind = weather_summary.find('div', {'data-testid': 'wind'}).find('span').text
-            forecast = Forecast(
-                self._clear_str_number(dailyTemperature),
-                rain_forecast,
-                wind,
-                hi,
-                lo,
-                description,
-                curr_date
-            )
-            forecast_results.append(forecast)
-            curr_date = curr_date + timedelta(days=1)
-
-        return forecast_results
+        return self.future_forecast_parser(args.area_code, n_days=5)
 
     def _tendays_forecast(self, args):
-        raise NotImplementedError()
+        return self.future_forecast_parser(args.area_code, n_days=10)
 
     def run(self, args):
         self._forecast_type = args.forecast_option
