@@ -5,6 +5,8 @@ from .forecast_type import ForecastType
 class Forecast:
     def __init__(self, current_temp, wind, humidity=None,
     high_temp=None, low_temp=None, desc='', forecast_date=None, feels_like=None, 
+    dew_point=None, pressure=None, uv_index=None,
+    visibility = None, moon_phase = None,
     sunrise=None, sunset=None, moonrise=None, moonset=None,
     rain_chance=None, rain_amt=None,
     forecast_type=ForecastType.TODAY):
@@ -15,6 +17,11 @@ class Forecast:
         self._description = desc
         self._wind = wind
         self._feels_like = feels_like
+        self._dew_point = dew_point
+        self._pressure = pressure
+        self._uv_index = uv_index
+        self._visibility = visibility
+        self._moonphase = moon_phase
         self._sunrise = sunrise
         self._sunset = sunset
         self._moonrise = moonrise
@@ -55,12 +62,12 @@ class Forecast:
     def __str__(self):
         temperature = None
         offset = ' '*10
+        inn_offset = ' '*4
 
         if self._forecast_type == ForecastType.TODAY:
             temperature = (
-                f'{offset}{self.current_temp}\xb0 ({self.description})\n'
-                f'{offset}High {self._high_temp}\xb0 / '
-                f'Low {self._low_temp}\xb0 '
+                f'{offset}{self.current_temp}\xb0 ({self.description}) \t {offset}Feels Like: {self._feels_like} \n\n'
+                f'{offset}High/Low: {self._high_temp}\xb0/{self._low_temp}\xb0 '
             )
         else:
             temperature = (
@@ -70,6 +77,8 @@ class Forecast:
         
         return (
                 f'>> {self.forecast_date}\n'
-                f'{temperature}\n'
-                f'{offset}Wind: {self._wind} / Humidity: {self._humidity}\n'
+                f'{temperature}{inn_offset}Wind: {self._wind} \n'
+                f'{offset}Humidity: {self._humidity}{inn_offset}Dew Point: {self._dew_point}  \n'
+                f'{offset}Pressure: {self._pressure}{inn_offset}UV Index: {self._uv_index}\n'
+                f'{offset}Visibility: {self._visibility}{inn_offset}Moon Phase: {self._moonphase}\n'
             )

@@ -82,6 +82,8 @@ class WeatherComParser:
         
 
         feelsLikeTemp = details_container.find('div', {'class': feelsLike_temp_div_regex}).text
+        feelsLikeTemp = re.sub('[a-zA-Z ]', '', feelsLikeTemp)
+
         sunrise_sunset_times = details_container.find_all('p', {'class': sunrise_settime_p_regex})
 
         sunrise_time = sunrise_sunset_times[0].text
@@ -103,11 +105,17 @@ class WeatherComParser:
 
         td_forecast = Forecast(
             self._clear_str_number(curr_temp),
-            addn_details['Humidity'],
             addn_details['Wind'],
+            addn_details['Humidity'],
             hi,
             lo,
-            description
+            description,
+            feels_like=feelsLikeTemp,
+            dew_point=addn_details['Dew Point'],
+            pressure=addn_details['Pressure'],
+            uv_index=addn_details['UV Index'],
+            visibility=addn_details['Visibility'],
+            moon_phase=addn_details['Moon Phase']
         )
 
         return [td_forecast]
