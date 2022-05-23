@@ -14,7 +14,7 @@ class WeatherComParser:
             ForecastType.FIVEDAYS: self._fivedays_forecast,
             ForecastType.TENDAYS: self._tendays_forecast
         }
-        self._base_url = 'https://weather.com/weather/{forecast}/l/{area}'
+        self._base_url = 'https://weather.com/weather/{forecast}/l/{area}?unit=e'
         self._request = Request(self._base_url)
         self._only_digits_regex = re.compile('[0-9]+')
         self._unit_converter = UnitConverter(Unit.FAHRENHEIT)

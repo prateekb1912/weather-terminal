@@ -3,14 +3,24 @@ from datetime import date
 from .forecast_type import ForecastType
 
 class Forecast:
-    def __init__(self, current_temp, humidity, wind, 
-    high_temp=None, low_temp=None, desc='', forecast_date=None, forecast_type=ForecastType.TODAY):
+    def __init__(self, current_temp, wind, humidity=None,
+    high_temp=None, low_temp=None, desc='', forecast_date=None, feels_like=None, 
+    sunrise=None, sunset=None, moonrise=None, moonset=None,
+    rain_chance=None, rain_amt=None,
+    forecast_type=ForecastType.TODAY):
         self._current_temp = current_temp
         self._high_temp = high_temp
         self._low_temp = low_temp
         self._humidity = humidity
         self._description = desc
         self._wind = wind
+        self._feels_like = feels_like
+        self._sunrise = sunrise
+        self._sunset = sunset
+        self._moonrise = moonrise
+        self._moonset = moonset
+        self._rain_chance = rain_chance
+        self.rain_amount = rain_amt
         self._forecast_type = forecast_type
 
         if forecast_date is None:
@@ -44,11 +54,11 @@ class Forecast:
 
     def __str__(self):
         temperature = None
-        offset = ' '*4
+        offset = ' '*10
 
         if self._forecast_type == ForecastType.TODAY:
             temperature = (
-                f'{offset}{self.current_temp}\xb0\n'
+                f'{offset}{self.current_temp}\xb0 ({self.description})\n'
                 f'{offset}High {self._high_temp}\xb0 / '
                 f'Low {self._low_temp}\xb0 '
             )
@@ -60,7 +70,6 @@ class Forecast:
         
         return (
                 f'>> {self.forecast_date}\n'
-                f'{temperature}'
-                f'({self._description})\n'
+                f'{temperature}\n'
                 f'{offset}Wind: {self._wind} / Humidity: {self._humidity}\n'
             )
