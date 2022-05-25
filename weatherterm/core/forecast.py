@@ -3,13 +3,16 @@ from datetime import date
 from .forecast_type import ForecastType
 
 class Forecast:
-    def __init__(self, current_temp, wind, humidity=None,
+    def __init__(self, location, timestamp,
+    current_temp, wind, humidity=None,
     high_temp=None, low_temp=None, desc='', forecast_date=None, feels_like=None, 
     dew_point=None, pressure=None, uv_index=None,
     visibility = None, moon_phase = None,
     sunrise=None, sunset=None, moonrise=None, moonset=None,
     rain_chance=None, rain_amt=None,
     forecast_type=ForecastType.TODAY):
+        self._location = location
+        self._timestamp = timestamp
         self._current_temp = current_temp
         self._high_temp = high_temp
         self._low_temp = low_temp
@@ -76,7 +79,8 @@ class Forecast:
             )
         
         return (
-                f'>> {self.forecast_date}\n'
+                f'{offset}{self.forecast_date}{inn_offset}'
+                f'{offset}{self._location} {self._timestamp}\n\n'
                 f'{temperature}{inn_offset}Wind: {self._wind} \n'
                 f'{offset}Humidity: {self._humidity}{inn_offset}Dew Point: {self._dew_point}  \n'
                 f'{offset}Pressure: {self._pressure}{inn_offset}UV Index: {self._uv_index}\n'

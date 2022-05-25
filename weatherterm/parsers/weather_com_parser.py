@@ -25,7 +25,7 @@ class WeatherComParser:
     
     def _fix_details(self, str_details):
         str_details['Wind'] = re.sub('Wind Direction', '', str_details['Wind'])
-        str_details['Pressure'] = re.sub('Arrow Down', '', str_details['Pressure'])
+        str_details['Pressure'] = re.sub('Arrow *(Up)|(Down)', '', str_details['Pressure'])
 
         return str_details        
 
@@ -65,6 +65,12 @@ class WeatherComParser:
     def _today_forecast(self, args):
         content = self._request.fetch_data(args.forecast_option.value, args.area_code)
         bs = BeautifulSoup(content, 'html.parser')
+
+        location_header_regex = re.compile('CurrentConditions--location*')
+        location = bs.find('h1', {'class': location_header_regex}).text
+
+        timestamp_span_regex = re.compile('CurrentConditions--timestamp*')
+        timestamp = bs.find('span', {'class': timestamp_span_regex}).text
         
         primary_div_regex = re.compile('CurrentConditions--primary*')
         temp_span_regex = re.compile('CurrentConditions--tempValue*')
@@ -104,6 +110,8 @@ class WeatherComParser:
         hi, lo = [self._clear_str_number(temp) for temp in addn_details['High / Low'].split('/')]
 
         td_forecast = Forecast(
+            location,
+            timestamp,
             self._clear_str_number(curr_temp),
             addn_details['Wind'],
             addn_details['Humidity'],
