@@ -71,18 +71,17 @@ class Forecast:
             temperature = (
                 f'{offset}{self.current_temp}\xb0 ({self.description}) \t {offset}Feels Like: {self._feels_like} \n\n'
                 f'{offset}High/Low: {self._high_temp}\xb0/{self._low_temp}\xb0 '
-            )
-        else:
-            temperature = (
-                f'{offset}High {self._high_temp}\xb0 / '
-                f'Low {self._low_temp}\xb0 '
-            )
-        
-        return (
+            )   
+            return (
                 f'{offset}{self.forecast_date}{inn_offset}'
                 f'{offset}{self._location} {self._timestamp}\n\n'
                 f'{temperature}{inn_offset}Wind: {self._wind} \n'
                 f'{offset}Humidity: {self._humidity}{inn_offset}Dew Point: {self._dew_point}  \n'
                 f'{offset}Pressure: {self._pressure}{inn_offset}UV Index: {self._uv_index}\n'
                 f'{offset}Visibility: {self._visibility}{inn_offset}Moon Phase: {self._moonphase}\n'
+            )
+
+        else:
+            return (
+                f'5-Day Weather {self._location}'
             )

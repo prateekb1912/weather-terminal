@@ -33,6 +33,12 @@ class WeatherComParser:
         content = self._request.fetch_data('tenday', area_code)
         bs = BeautifulSoup(content, 'html.parser')
 
+        location_span_regex = re.compile('LocationPageTitle--LocationText*')
+        location = bs.find('span', {'class': location_span_regex}).text
+
+        timestamp_div_regex = re.compile('DailyForecast--timestamp*')
+        timestamp = bs.find('div', {'class': timestamp_div_regex}).text
+
         list_divs_regex = re.compile('DailyForecast--DisclosureList*')
         list_divs_forecasts = bs.find('div', {'class': list_divs_regex})
 
@@ -48,14 +54,11 @@ class WeatherComParser:
             rain_forecast = weather_summary.find('div', {'data-testid': 'Precip'}).find('span').text
             wind = weather_summary.find('div', {'data-testid': 'wind'}).find('span').text
             forecast = Forecast(
-                self._clear_str_number(dailyTemperature),
-                rain_forecast,
+                location,
+                timestamp,
+                dailyTemperature,
                 wind,
-                hi,
-                lo,
-                description,
-                curr_date,
-                ForecastType.FIVEDAYS
+                forecast_type=ForecastType.FIVEDAYS
             )
             forecast_results.append(forecast)
             curr_date = curr_date + timedelta(days=1)
