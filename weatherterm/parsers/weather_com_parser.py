@@ -47,18 +47,30 @@ class WeatherComParser:
         forecast_results = []
         curr_date = date.today()
         for curr_forecast in forecast_details:
-            weather_summary = curr_forecast.find('summary')
-            dailyTemperature = weather_summary.find('div', {'data-testid':'detailsTemperature'}).text
-            hi, lo = [self._clear_str_number(temp) for temp in dailyTemperature.split('/')]
-            description = weather_summary.find('div', {'data-testid': 'wxIcon'}).find('span').text
-            rain_forecast = weather_summary.find('div', {'data-testid': 'Precip'}).find('span').text
-            wind = weather_summary.find('div', {'data-testid': 'wind'}).find('span').text
+            temp_summ_divs_regex = re.compile('DailyContent--DailyContent*')
+            addn_details_divs_regex = re.compile('DaypartDetails--DetailsTable*')
+
+            temp_summ_divs = bs.find_all('div', {'class': temp_summ_divs_regex})
+            addn_details_divs = bs.find_all('div', {'class': addn_details_divs_regex})
+
+            day_temp_div = None
+            day_addn_details_div = None
+
+            if len(temp_summ_divs) > 1:
+                day_temp_div, night_temp_div = temp_summ_divs
+                day_addn_details_div, night_addn_details_div = addn_details_divs
+
+            else:
+                night_temp_div = temp_summ_divs[0]
+                night_addn_details_div = addn_details_divs[0]
+
             forecast = Forecast(
                 location,
                 timestamp,
                 dailyTemperature,
                 wind,
-                forecast_type=ForecastType.FIVEDAYS
+                forecast_type=ForecastType.FIVEDAYS,
+                forecast_date=curr_date
             )
             forecast_results.append(forecast)
             curr_date = curr_date + timedelta(days=1)

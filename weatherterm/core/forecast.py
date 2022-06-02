@@ -83,5 +83,6 @@ class Forecast:
 
         else:
             return (
-                f'5-Day Weather {self._location}'
+                f'{offset}{self.forecast_date}{inn_offset}'
+                
             )
