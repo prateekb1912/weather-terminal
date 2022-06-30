@@ -88,8 +88,5 @@ cls = parsers[args.parser]
 parser = cls()
 results = parser.run(args)
 
-if args.forecast_option == ForecastType.TODAY:
-    print(results[0])
-
-else:
-    print(results)
+for res in results:
+    print(res)

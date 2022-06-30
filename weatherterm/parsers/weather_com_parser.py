@@ -62,7 +62,8 @@ class WeatherComParser:
 
             hi, lo = [self._clear_str_number(temp) for temp in hilo_temps.split('/')]
 
-            forecast = Forecast(
+            forecast_results.append(
+                Forecast(
                 location=location,
                 timestamp=timestamp,
                 wind=wind,
@@ -72,6 +73,7 @@ class WeatherComParser:
                 forecast_date=curr_day,
                 rain_chance=rain_chance,
                 forecast_type=ForecastType.TENDAYS
+                )
             )
 
         return forecast_results

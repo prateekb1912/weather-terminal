@@ -84,6 +84,6 @@ class Forecast:
 
         else:
             return (
-                f'{offset}{self.forecast_date}{inn_offset}'
-                
+                f'{self.forecast_date}{inn_offset}{self._high_temp}\xb0/{self._low_temp}\xb0'
+                f'{inn_offset}{self.description}{inn_offset}{self._rain_chance}{inn_offset}{self._wind}'
             )
