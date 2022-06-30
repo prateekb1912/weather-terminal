@@ -1,6 +1,6 @@
 import re
 from bs4 import BeautifulSoup
-from datetime import date, timedelta
+from datetime import date
 
 from weatherterm.core import ForecastType, Request, Unit, UnitConverter
 from weatherterm.core.forecast import Forecast
@@ -47,33 +47,26 @@ class WeatherComParser:
         forecast_results = []
         curr_date = date.today()
         for curr_forecast in forecast_details:
-            temp_summ_divs_regex = re.compile('DailyContent--DailyContent*')
+            temp_divs_regex = re.compile('DailyContent--DailyContent*')
             addn_details_divs_regex = re.compile('DaypartDetails--DetailsTable*')
 
-            temp_summ_divs = bs.find_all('div', {'class': temp_summ_divs_regex})
-            addn_details_divs = bs.find_all('div', {'class': addn_details_divs_regex})
+            temp_divs = curr_forecast.find_all('div', {'class': temp_divs_regex})
+            addn_details = curr_forecast.find_all('div', {'class': addn_details_divs_regex})
 
-            day_temp_div = None
-            day_addn_details_div = None
+            day_temp = None
+            day_addn = None
 
-            if len(temp_summ_divs) > 1:
-                day_temp_div, night_temp_div = temp_summ_divs
-                day_addn_details_div, night_addn_details_div = addn_details_divs
-
+            if len(temp_divs) > 1:
+                day_temp, night_temp = temp_divs
+                day_addn, night_addn = addn_details
+            
             else:
-                night_temp_div = temp_summ_divs[0]
-                night_addn_details_div = addn_details_divs[0]
+                night_temp = temp_divs[0]
+                night_addn = addn_details[0]
+            
+            
 
-            forecast = Forecast(
-                location,
-                timestamp,
-                dailyTemperature,
-                wind,
-                forecast_type=ForecastType.FIVEDAYS,
-                forecast_date=curr_date
-            )
-            forecast_results.append(forecast)
-            curr_date = curr_date + timedelta(days=1)
+
 
         return forecast_results
 
