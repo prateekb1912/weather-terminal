@@ -138,7 +138,9 @@ class WeatherComParser:
             pressure=addn_details['Pressure'],
             uv_index=addn_details['UV Index'],
             visibility=addn_details['Visibility'],
-            moon_phase=addn_details['Moon Phase']
+            moon_phase=addn_details['Moon Phase'],
+            sunrise=sunrise_time,
+            sunset=sunset_time
         )
 
         return [td_forecast]

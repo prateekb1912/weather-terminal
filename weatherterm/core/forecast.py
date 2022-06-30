@@ -79,6 +79,7 @@ class Forecast:
                 f'{offset}Humidity: {self._humidity}{inn_offset}Dew Point: {self._dew_point}  \n'
                 f'{offset}Pressure: {self._pressure}{inn_offset}UV Index: {self._uv_index}\n'
                 f'{offset}Visibility: {self._visibility}{inn_offset}Moon Phase: {self._moonphase}\n'
+                f'{offset}Sunrise: {self._sunrise}{inn_offset}Sunset: {self._sunset}\n'
             )
 
         else:
