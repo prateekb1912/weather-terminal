@@ -45,28 +45,34 @@ class WeatherComParser:
         forecast_details = list_divs_forecasts.find_all('details')[:n_days]
 
         forecast_results = []
-        curr_date = date.today()
         for curr_forecast in forecast_details:
-            temp_divs_regex = re.compile('DailyContent--DailyContent*')
-            addn_details_divs_regex = re.compile('DaypartDetails--DetailsTable*')
+            summ_regex = re.compile('DetailsSummary--DetailsSummary*')
+            hilo_temp_regex = re.compile('DetailsSummary--temperature*')
+            condition_regex = re.compile('DetailsSummary--extendedData*')
+            precip_regex = re.compile('DetailsSummary--precip*')
+            wind_regex = re.compile('Wind--windWrapper*')
 
-            temp_divs = curr_forecast.find_all('div', {'class': temp_divs_regex})
-            addn_details = curr_forecast.find_all('div', {'class': addn_details_divs_regex})
+            summary = curr_forecast.find('div', {'class': summ_regex})
 
-            day_temp = None
-            day_addn = None
+            curr_day = summary.find('h3').text
+            hilo_temps = summary.find('div', {'class': hilo_temp_regex}).text
+            condition = summary.find('span', {'class': condition_regex}).text
+            rain_chance = summary.find('div', {'class': precip_regex}).span.text
+            wind = summary.find('span', {'class': wind_regex}).text
 
-            if len(temp_divs) > 1:
-                day_temp, night_temp = temp_divs
-                day_addn, night_addn = addn_details
-            
-            else:
-                night_temp = temp_divs[0]
-                night_addn = addn_details[0]
-            
-            
+            hi, lo = [self._clear_str_number(temp) for temp in hilo_temps.split('/')]
 
-
+            forecast = Forecast(
+                location=location,
+                timestamp=timestamp,
+                wind=wind,
+                high_temp=hi,
+                low_temp=lo,
+                desc=condition,
+                forecast_date=curr_day,
+                rain_chance=rain_chance,
+                forecast_type=ForecastType.TENDAYS
+            )
 
         return forecast_results
 

@@ -4,7 +4,7 @@ from .forecast_type import ForecastType
 
 class Forecast:
     def __init__(self, location, timestamp,
-    current_temp, wind, humidity=None,
+    current_temp=None, wind=None, humidity=None,
     high_temp=None, low_temp=None, desc='', forecast_date=None, feels_like=None, 
     dew_point=None, pressure=None, uv_index=None,
     visibility = None, moon_phase = None,
